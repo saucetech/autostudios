@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useMemo, useCallback, memo, useEffect } from "react"
 import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd"
 import { Button } from "@/components/ui/button"
@@ -11,7 +9,6 @@ import { Progress } from "@/components/ui/progress"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { ContentEditor } from "./content-editor"
 import { useContentPipeline } from "@/lib/hooks/use-content-pipeline"
-import { n8nService } from "@/lib/n8n" // Import n8n service
 import {
   Plus,
   Star,
@@ -110,46 +107,6 @@ const ContentCard = memo(
       [item.views, item.engagement, item.shares],
     )
 
-    const handleGenerateAvatar = useCallback(
-      async (e: React.MouseEvent) => {
-        e.stopPropagation()
-
-        if (!item.content) {
-          toast.error("No script content available to generate avatar")
-          return
-        }
-
-        try {
-          toast.loading("Generating AI Avatar with Heygen...", { id: "heygen-generation" })
-
-          // Trigger n8n workflow for Heygen AI Avatar generation
-          const response = await n8nService.triggerWebhook("heygen-avatar-generator", {
-            script: item.content,
-            title: item.title,
-            contentId: item.id,
-            type: "avatar-generation",
-            metadata: {
-              priority: item.priority,
-              tags: item.tags,
-              viral_hook: item.viral_hook,
-            },
-          })
-
-          if (response) {
-            toast.success("AI Avatar generation started! You'll receive a notification when complete.", {
-              id: "heygen-generation",
-            })
-          } else {
-            throw new Error("Failed to trigger workflow")
-          }
-        } catch (error) {
-          console.error("Failed to generate avatar:", error)
-          toast.error("Failed to start AI Avatar generation", { id: "heygen-generation" })
-        }
-      },
-      [item],
-    )
-
     return (
       <Draggable key={item.id} draggableId={item.id} index={index}>
         {(provided, snapshot) => (
@@ -231,10 +188,7 @@ const ContentCard = memo(
                         item.content && (
                           <>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={handleGenerateAvatar}
-                              className="text-purple-400 focus:text-purple-300"
-                            >
+                            <DropdownMenuItem onClick={() => {}} className="text-purple-400 focus:text-purple-300">
                               <Video className="w-4 h-4 mr-2" />
                               Generate AI Avatar
                             </DropdownMenuItem>
@@ -280,7 +234,7 @@ const ContentCard = memo(
               {(item.type === "script" || item.type === "video" || item.type === "audio" || item.type === "post") &&
                 item.content && (
                   <Button
-                    onClick={handleGenerateAvatar}
+                    onClick={() => {}}
                     size="sm"
                     className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white text-xs font-medium shadow-lg hover:shadow-xl transition-all duration-200"
                   >
